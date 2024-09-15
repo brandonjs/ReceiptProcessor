@@ -1,5 +1,5 @@
 # Use a base image with the required runtime environment
-FROM node:20
+FROM node:21
 
 # Set the working directory in the container
 WORKDIR /src

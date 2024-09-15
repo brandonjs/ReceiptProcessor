@@ -40,7 +40,7 @@ export class FileDB {
         JSON.stringify(this.receipts),
         'utf-8',
       );
-      console.log(`Receipts saved successfully!`);
+      console.log(`Receipt saved successfully!`);
     } catch (error) {
       console.log(`Error: ${error}`);
     }
