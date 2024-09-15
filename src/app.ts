@@ -5,7 +5,14 @@ import { Constants } from './utils';
 import { ReceiptsRouter } from './routes/receipts';
 
 export class ReceiptsApp {
+  /**
+   * @description The PORT to run the server on.
+   */
   readonly port: number = Constants.PORT;
+
+  /**
+   * @description The express app.
+   */
   readonly app = express();
 
   constructor() {
@@ -15,9 +22,15 @@ export class ReceiptsApp {
     }
   }
 
+  /**
+   * @description Sets up the express app and runs it on the provided port..
+   */
   run() {
+    // Process all data sent in post as JSON.
     this.app.use(express.json({ type: '*/*' }));
-    this.app.use('/receipts', new ReceiptsRouter().router);
+
+    // Add the receipt processor on /receipts.
+    this.app.use(Constants.RECEIPTS_PATH, new ReceiptsRouter().router);
 
     this.app.listen(this.port, () => {
       console.log(`Server is listening on port ${this.port}`);
