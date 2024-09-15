@@ -23,27 +23,33 @@ export class ReceiptsRouter {
    * @return JSON representation of the receipt ID, or error if thrown.
    */
   private addProcessRoute() {
-    this.router.post(Constants.PROCESS_PATH, async (req: Request, res: Response) => {
-      try {
-        const receipt: Receipt = new Receipt(req.body);
-        if (!(await receipt.isValid())) {
+    this.router.post(
+      Constants.PROCESS_PATH,
+      async (req: Request, res: Response) => {
+        try {
+          const receipt: Receipt = new Receipt(req.body);
+          if (!(await receipt.isValid())) {
+            return res
+              .setHeader('Content-Type', 'application/json')
+              .status(StatusCodes.BAD_REQUEST)
+              .json({
+                error:
+                  'Provided receipt is invalid. Please check all parameters and try again.',
+              });
+          }
+          const result = await this.db.saveReceipt(receipt);
           return res
             .setHeader('Content-Type', 'application/json')
-            .status(StatusCodes.BAD_REQUEST)
-            .json({ error: 'Provided receipt is invalid. Please check all parameters and try again.' });
+            .status(StatusCodes.CREATED)
+            .json(result);
+        } catch (error) {
+          return res
+            .setHeader('Content-Type', 'application/json')
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({ error });
         }
-        const result = await this.db.saveReceipt(receipt);
-        return res
-          .setHeader('Content-Type', 'application/json')
-          .status(StatusCodes.CREATED)
-          .json(result);
-      } catch (error) {
-        return res
-          .setHeader('Content-Type', 'application/json')
-          .status(StatusCodes.INTERNAL_SERVER_ERROR)
-          .json({ error });
-      }
-    });
+      },
+    );
   }
 
   /**
@@ -54,28 +60,31 @@ export class ReceiptsRouter {
    * @return JSON representation of the receipt ID, or error if thrown.
    */
   private addPointsRoute() {
-    this.router.get(Constants.POINTS_PATH, async (req: Request, res: Response) => {
-      try {
-        const receipt = await this.db.getReceipt(req.params.id);
-        if (receipt === null) {
-          console.log(`Receipt not found with id: ${req.params.id}`);
+    this.router.get(
+      Constants.POINTS_PATH,
+      async (req: Request, res: Response) => {
+        try {
+          const receipt = await this.db.getReceipt(req.params.id);
+          if (receipt === null) {
+            console.log(`Receipt not found with id: ${req.params.id}`);
+            return res
+              .setHeader('Content-Type', 'application/json')
+              .status(StatusCodes.NOT_FOUND)
+              .json({ message: 'Receipt not found.' });
+          }
+
+          const points = await receipt.calculatePoints();
           return res
             .setHeader('Content-Type', 'application/json')
-            .status(StatusCodes.NOT_FOUND)
-            .json({ message: 'Receipt not found.' });
+            .status(StatusCodes.OK)
+            .json({ points: points.valueOf() });
+        } catch (error) {
+          return res
+            .setHeader('Content-Type', 'application/json')
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({ error });
         }
-
-        const points = await receipt.calculatePoints();
-        return res
-          .setHeader('Content-Type', 'application/json')
-          .status(StatusCodes.OK)
-          .json({ points: points.valueOf() });
-      } catch (error) {
-        return res
-          .setHeader('Content-Type', 'application/json')
-          .status(StatusCodes.INTERNAL_SERVER_ERROR)
-          .json({ error });
-      }
-    });
+      },
+    );
   }
 }

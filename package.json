@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "jest",
-    "dev": "ts-node-dev --pretty --respawn ./src/app.ts"
+    "dev": "ts-node-dev --pretty --respawn ./src/app.ts",
+    "format": "npx prettier -w src/ tst/"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",
@@ -22,6 +23,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "http-status-codes": "^2.3.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "tsc": "^2.0.4",
+    "tsx": "^4.19.1"
   }
 }

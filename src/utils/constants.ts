@@ -1,5 +1,4 @@
 export class Constants {
-
   /* The port for the app to listen on. */
   public static readonly PORT: number = 8080;
 
